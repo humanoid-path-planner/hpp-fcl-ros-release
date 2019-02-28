@@ -12,7 +12,7 @@ ExternalProject_Add(hpp-fcl_src
   GIT_REPOSITORY "https://github.com/humanoid-path-planner/hpp-fcl.git"
   GIT_TAG "v1.0.1"
 
-  CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_BINARY_DIR}/install
+  CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_BINARY_DIR}/install -DCMAKE_INSTALL_LIBDIR=lib
 )
 ExternalProject_Add_Step(hpp-fcl_src CopyToDevel
   COMMENT "Copying to devel"
@@ -31,7 +31,7 @@ if(IS_DIRECTORY ${CMAKE_INSTALL_PREFIX})
   )
 else()
   message(STATUS "Compiling for devel workspace")
-  file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/hpp)
+  file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/hpp/fcl)
   catkin_package(
     INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/
     LIBRARIES hpp-fcl ${ASSIMP_LIBRARIES}
