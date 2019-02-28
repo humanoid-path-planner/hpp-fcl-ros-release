@@ -1,0 +1,12 @@
+Source: ros-melodic-hpp-fcl
+Section: misc
+Priority: extra
+Maintainer: Wolfgang Merkt <wolfgang.merkt@ed.ac.uk>
+Build-Depends: debhelper (>= 9.0.0), git, libassimp-dev, libboost-all-dev, libeigen3-dev, ros-melodic-catkin, ros-melodic-octomap
+Homepage: https://github.com/humanoid-path-planner/hpp-fcl
+Standards-Version: 3.9.2
+
+Package: ros-melodic-hpp-fcl
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libassimp-dev, libboost-all-dev, libeigen3-dev, ros-melodic-octomap
+Description: HPP fork of FCL with bug fixes.
