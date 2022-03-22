@@ -35,17 +35,19 @@ tracks:
     - git-bloom-generate -y rosdebian --prefix release/:{ros_distro} :{ros_distro}
       -i :{release_inc} --os-name debian --os-not-required
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc}
+      :{release_inc} --os-name fedora
+    - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
+      :{release_inc} --os-name rhel
     devel_branch: master
     last_version: 1.0.1
     name: upstream
     patches: null
     release_inc: '2'
-    release_repo_url: git@github.com:ipab-slmc/hpp-fcl_catkin-release.git
-    release_tag: :{version}
+    release_repo_url: git@github.com:humanoid-path-planner/hpp-fcl-ros-release.git
+    release_tag: v:{version}
     ros_distro: melodic
     vcs_type: git
-    vcs_uri: https://github.com/ipab-slmc/hpp-fcl_catkin.git
+    vcs_uri: https://github.com/humanoid-path-planner/hpp-fcl.git
     version: :{auto}
   noetic:
     actions:
