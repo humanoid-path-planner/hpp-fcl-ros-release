@@ -1,3 +1,26 @@
+## hpp-fcl (melodic) - 1.8.1-1
+
+The packages in the `hpp-fcl` repository were released into the `melodic` distro by running `/usr/bin/bloom-release -r melodic hpp-fcl --edit` on `Tue, 22 Mar 2022 11:02:31 -0000`
+
+The `hpp-fcl` package was released.
+
+Version of package(s) in repository `hpp-fcl`:
+
+- upstream repository: https://github.com/humanoid-path-planner/hpp-fcl.git
+- release repository: https://github.com/humanoid-path-planner/hpp-fcl-ros-release.git
+- rosdistro version: `1.0.1-2`
+- old version: `1.0.1-2`
+- new version: `1.8.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## hpp-fcl (noetic) - 1.8.1-1
 
 The packages in the `hpp-fcl` repository were released into the `noetic` distro by running `/usr/bin/bloom-release -r noetic hpp-fcl` on `Sun, 20 Mar 2022 21:56:44 -0000`
