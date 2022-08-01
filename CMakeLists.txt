@@ -57,6 +57,8 @@ IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
   MESSAGE(FATAL_ERROR "\nPlease run the following command first:\ngit submodule update --init\n")
 ENDIF()
 
+set(PYTHON_EXECUTABLE "/usr/bin/python3")  # Patch for Debian Buster - select Python3
+
 include(cmake/boost.cmake)
 include(cmake/python.cmake)
 include(cmake/hpp.cmake)
