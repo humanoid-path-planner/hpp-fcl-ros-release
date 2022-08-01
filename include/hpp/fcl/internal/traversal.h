@@ -39,40 +39,37 @@
 
 /// @cond INTERNAL
 
-namespace hpp
-{
-namespace fcl
-{
+namespace hpp {
+namespace fcl {
 
-enum {
-  RelativeTransformationIsIdentity = 1
+enum { RelativeTransformationIsIdentity = 1 };
+
+namespace details {
+template <bool enabled>
+struct HPP_FCL_DLLAPI RelativeTransformation {
+  RelativeTransformation() : R(Matrix3f::Identity()) {}
+
+  const Matrix3f& _R() const { return R; }
+  const Vec3f& _T() const { return T; }
+
+  Matrix3f R;
+  Vec3f T;
 };
 
-namespace details
-{
-  template <bool enabled>
-  struct HPP_FCL_DLLAPI RelativeTransformation
-  {
-    RelativeTransformation () : R (Matrix3f::Identity()) {}
+template <>
+struct HPP_FCL_DLLAPI RelativeTransformation<false> {
+  static const Matrix3f& _R() {
+    HPP_FCL_THROW_PRETTY("should never reach this point", std::logic_error);
+  }
+  static const Vec3f& _T() {
+    HPP_FCL_THROW_PRETTY("should never reach this point", std::logic_error);
+  }
+};
+}  // namespace details
 
-    const Matrix3f& _R () const { return R; }
-    const Vec3f   & _T () const { return T; }
+}  // namespace fcl
 
-    Matrix3f R;
-    Vec3f T;
-  };
-
-  template <>
-  struct HPP_FCL_DLLAPI RelativeTransformation <false>
-  {
-    static const Matrix3f& _R () { throw std::logic_error ("should never reach this point"); }
-    static const Vec3f   & _T () { throw std::logic_error ("should never reach this point"); }
-  };
-} // namespace details
-
-}
-
-} // namespace hpp
+}  // namespace hpp
 
 /// @endcond
 

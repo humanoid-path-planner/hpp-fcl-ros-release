@@ -44,70 +44,85 @@
 #include "doxygen_autodoc/hpp/fcl/narrowphase/gjk.h"
 #endif
 
-#include "../doc/python/doxygen.hh"
-#include "../doc/python/doxygen-boost.hh"
-
-#define DEF_RW_CLASS_ATTRIB(CLASS, ATTRIB)                                     \
-  def_readwrite (#ATTRIB, &CLASS::ATTRIB,                                      \
-      doxygen::class_attrib_doc<CLASS>(#ATTRIB))
-#define DEF_CLASS_FUNC(CLASS, ATTRIB)                                          \
-  def (#ATTRIB, &CLASS::ATTRIB, doxygen::member_func_doc(&CLASS::ATTRIB))
-
 using namespace boost::python;
-
 using namespace hpp::fcl;
-using hpp::fcl::details::MinkowskiDiff;
-using hpp::fcl::details::GJK;
 using hpp::fcl::details::EPA;
+using hpp::fcl::details::GJK;
+using hpp::fcl::details::MinkowskiDiff;
 
-void exposeGJK()
-{
-  if(!eigenpy::register_symbolic_link_to_registered_type<GJK::Status>())
-  {
-    enum_ <GJK::Status> ("GJKStatus")
-      .value ("Valid", GJK::Valid)
-      .value ("Inside", GJK::Inside)
-      .value ("Failed", GJK::Failed)
-      .export_values()
-      ;
+void exposeGJK() {
+  if (!eigenpy::register_symbolic_link_to_registered_type<GJK::Status>()) {
+    enum_<GJK::Status>("GJKStatus")
+        .value("Valid", GJK::Valid)
+        .value("Inside", GJK::Inside)
+        .value("Failed", GJK::Failed)
+        .export_values();
   }
 
-  if(!eigenpy::register_symbolic_link_to_registered_type<MinkowskiDiff>())
-  {
-    class_ <MinkowskiDiff> ("MinkowskiDiff", doxygen::class_doc<MinkowskiDiff>(), no_init)
-      .def (doxygen::visitor::init<MinkowskiDiff>())
-      .def ("set", static_cast < void (MinkowskiDiff::*)(
-            const ShapeBase*, const ShapeBase*)> (&MinkowskiDiff::set),
-          doxygen::member_func_doc(
-            static_cast < void (MinkowskiDiff::*)(
-              const ShapeBase*, const ShapeBase*)> (&MinkowskiDiff::set)))
-      .def ("set", static_cast < void (MinkowskiDiff::*)(
-            const ShapeBase*, const ShapeBase*,
-            const Transform3f& tf0, const Transform3f& tf1)> (&MinkowskiDiff::set),
-          doxygen::member_func_doc(
-            static_cast < void (MinkowskiDiff::*)(
-              const ShapeBase*, const ShapeBase*,
-              const Transform3f& tf0, const Transform3f& tf1)> (&MinkowskiDiff::set)))
-      .DEF_CLASS_FUNC(MinkowskiDiff, support0)
-      .DEF_CLASS_FUNC(MinkowskiDiff, support1)
-      .DEF_CLASS_FUNC(MinkowskiDiff, support)
-      .DEF_RW_CLASS_ATTRIB(MinkowskiDiff, inflation)
-      ;
+  if (!eigenpy::register_symbolic_link_to_registered_type<MinkowskiDiff>()) {
+    class_<MinkowskiDiff>("MinkowskiDiff", doxygen::class_doc<MinkowskiDiff>(),
+                          no_init)
+        .def(doxygen::visitor::init<MinkowskiDiff>())
+        .def("set",
+             static_cast<void (MinkowskiDiff::*)(
+                 const ShapeBase*, const ShapeBase*)>(&MinkowskiDiff::set),
+             doxygen::member_func_doc(
+                 static_cast<void (MinkowskiDiff::*)(
+                     const ShapeBase*, const ShapeBase*)>(&MinkowskiDiff::set)))
+        .def("set",
+             static_cast<void (MinkowskiDiff::*)(
+                 const ShapeBase*, const ShapeBase*, const Transform3f& tf0,
+                 const Transform3f& tf1)>(&MinkowskiDiff::set),
+             doxygen::member_func_doc(
+                 static_cast<void (MinkowskiDiff::*)(
+                     const ShapeBase*, const ShapeBase*, const Transform3f& tf0,
+                     const Transform3f& tf1)>(&MinkowskiDiff::set)))
+        .DEF_CLASS_FUNC(MinkowskiDiff, support0)
+        .DEF_CLASS_FUNC(MinkowskiDiff, support1)
+        .DEF_CLASS_FUNC(MinkowskiDiff, support)
+        .DEF_RW_CLASS_ATTRIB(MinkowskiDiff, inflation)
+        .DEF_RW_CLASS_ATTRIB(MinkowskiDiff, normalize_support_direction);
   }
 
-  if(!eigenpy::register_symbolic_link_to_registered_type<GJK>())
-  {
-    class_ <GJK> ("GJK", doxygen::class_doc<GJK>(), no_init)
-     .def (doxygen::visitor::init<GJK, unsigned int, FCL_REAL>())
-      .DEF_RW_CLASS_ATTRIB (GJK, distance)
-      .DEF_RW_CLASS_ATTRIB (GJK, ray)
-      .DEF_RW_CLASS_ATTRIB (GJK, support_hint)
-      .DEF_CLASS_FUNC(GJK, evaluate)
-      .DEF_CLASS_FUNC(GJK, hasClosestPoints)
-      .DEF_CLASS_FUNC(GJK, hasPenetrationInformation)
-      .DEF_CLASS_FUNC(GJK, getClosestPoints)
-      .DEF_CLASS_FUNC(GJK, setDistanceEarlyBreak)
-      .DEF_CLASS_FUNC(GJK, getGuessFromSimplex)
-      ;
+  if (!eigenpy::register_symbolic_link_to_registered_type<GJKVariant>()) {
+    enum_<GJKVariant>("GJKVariant")
+        .value("DefaultGJK", GJKVariant::DefaultGJK)
+        .value("NesterovAcceleration", GJKVariant::NesterovAcceleration)
+        .export_values();
+  }
+
+  if (!eigenpy::register_symbolic_link_to_registered_type<
+          GJKConvergenceCriterion>()) {
+    enum_<GJKConvergenceCriterion>("GJKConvergenceCriterion")
+        .value("VDB", GJKConvergenceCriterion::VDB)
+        .value("DualityGap", GJKConvergenceCriterion::DualityGap)
+        .value("Hybrid", GJKConvergenceCriterion::Hybrid)
+        .export_values();
+  }
+
+  if (!eigenpy::register_symbolic_link_to_registered_type<
+          GJKConvergenceCriterionType>()) {
+    enum_<GJKConvergenceCriterionType>("GJKConvergenceCriterionType")
+        .value("Absolute", GJKConvergenceCriterionType::Absolute)
+        .value("Relative", GJKConvergenceCriterionType::Relative)
+        .export_values();
+  }
+
+  if (!eigenpy::register_symbolic_link_to_registered_type<GJK>()) {
+    class_<GJK>("GJK", doxygen::class_doc<GJK>(), no_init)
+        .def(doxygen::visitor::init<GJK, unsigned int, FCL_REAL>())
+        .DEF_RW_CLASS_ATTRIB(GJK, distance)
+        .DEF_RW_CLASS_ATTRIB(GJK, ray)
+        .DEF_RW_CLASS_ATTRIB(GJK, support_hint)
+        .DEF_RW_CLASS_ATTRIB(GJK, gjk_variant)
+        .DEF_RW_CLASS_ATTRIB(GJK, convergence_criterion)
+        .DEF_RW_CLASS_ATTRIB(GJK, convergence_criterion_type)
+        .DEF_CLASS_FUNC(GJK, evaluate)
+        .DEF_CLASS_FUNC(GJK, hasClosestPoints)
+        .DEF_CLASS_FUNC(GJK, hasPenetrationInformation)
+        .DEF_CLASS_FUNC(GJK, getClosestPoints)
+        .DEF_CLASS_FUNC(GJK, setDistanceEarlyBreak)
+        .DEF_CLASS_FUNC(GJK, getGuessFromSimplex)
+        .DEF_CLASS_FUNC(GJK, getIterations);
   }
 }

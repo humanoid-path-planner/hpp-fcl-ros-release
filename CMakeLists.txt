@@ -40,6 +40,7 @@ set(PROJECT_DESCRIPTION
   "HPP fork of FCL -- The Flexible Collision Library"
   )
 SET(PROJECT_USE_CMAKE_EXPORT TRUE)
+SET(PROJECT_COMPATIBILITY_VERSION AnyNewerVersion)
 
 # Do not support CMake older than 2.8.12
 CMAKE_POLICY(SET CMP0022 NEW)
@@ -57,10 +58,7 @@ IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
   MESSAGE(FATAL_ERROR "\nPlease run the following command first:\ngit submodule update --init\n")
 ENDIF()
 
-set(PYTHON_EXECUTABLE "/usr/bin/python3")  # Patch for Debian Buster - select Python3
-
 include(cmake/boost.cmake)
-include(cmake/python.cmake)
 include(cmake/hpp.cmake)
 include(cmake/apple.cmake)
 include(cmake/ide.cmake)
@@ -75,6 +73,9 @@ APPLY_DEFAULT_APPLE_CONFIGURATION()
 
 COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
 PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
+
+# Default C++ version should be C++11
+CHECK_MINIMAL_CXX_STANDARD(11 ENFORCE)
 
 OPTION(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
 CMAKE_DEPENDENT_OPTION(GENERATE_PYTHON_STUBS "Generate the Python stubs associated to the Python library" OFF BUILD_PYTHON_INTERFACE OFF)
@@ -95,7 +96,7 @@ CMAKE_DEPENDENT_OPTION(GENERATE_PYTHON_STUBS "Generate the Python stubs associat
 ADD_PROJECT_DEPENDENCY(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.0.0")
 
 if(BUILD_PYTHON_INTERFACE)
-  FIND_PACKAGE(eigenpy 2.2 REQUIRED)
+  FIND_PACKAGE(eigenpy 2.7.10 REQUIRED)
 endif()
 
 # Required dependencies
@@ -107,8 +108,6 @@ ELSE(WIN32)
   ADD_PROJECT_DEPENDENCY(Boost REQUIRED chrono serialization)
 ENDIF(WIN32)
 if(BUILD_PYTHON_INTERFACE)
-  FINDPYTHON()
-  search_for_boost_python(REQUIRED)
   find_package(Boost REQUIRED COMPONENTS system)
 endif(BUILD_PYTHON_INTERFACE)
 
@@ -128,7 +127,6 @@ endif()
 
 option(HPP_FCL_HAS_QHULL "use qhull library to compute convex hulls." FALSE)
 if(HPP_FCL_HAS_QHULL)
-  CHECK_MINIMAL_CXX_STANDARD(11 ENFORCE)
   find_package(Qhull COMPONENTS qhull_r qhullcpp)
   if(Qhull_FOUND)
     set(HPP_FCL_USE_SYSTEM_QHULL TRUE)
@@ -166,12 +164,49 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/fcl/BV/AABB.h
   include/hpp/fcl/BV/OBB.h
   include/hpp/fcl/BV/kDOP.h
+  include/hpp/fcl/broadphase/broadphase.h
+  include/hpp/fcl/broadphase/broadphase_SSaP.h
+  include/hpp/fcl/broadphase/broadphase_SaP.h
+  include/hpp/fcl/broadphase/broadphase_bruteforce.h
+  include/hpp/fcl/broadphase/broadphase_collision_manager.h
+  include/hpp/fcl/broadphase/broadphase_continuous_collision_manager-inl.h
+  include/hpp/fcl/broadphase/broadphase_continuous_collision_manager.h
+  include/hpp/fcl/broadphase/broadphase_dynamic_AABB_tree-inl.h
+  include/hpp/fcl/broadphase/broadphase_dynamic_AABB_tree.h
+  include/hpp/fcl/broadphase/broadphase_dynamic_AABB_tree_array-inl.h
+  include/hpp/fcl/broadphase/broadphase_dynamic_AABB_tree_array.h
+  include/hpp/fcl/broadphase/broadphase_interval_tree.h
+  include/hpp/fcl/broadphase/broadphase_spatialhash-inl.h
+  include/hpp/fcl/broadphase/broadphase_spatialhash.h
+  include/hpp/fcl/broadphase/broadphase_callbacks.h
+  include/hpp/fcl/broadphase/default_broadphase_callbacks.h
+  include/hpp/fcl/broadphase/detail/hierarchy_tree-inl.h
+  include/hpp/fcl/broadphase/detail/hierarchy_tree.h
+  include/hpp/fcl/broadphase/detail/hierarchy_tree_array-inl.h
+  include/hpp/fcl/broadphase/detail/hierarchy_tree_array.h
+  include/hpp/fcl/broadphase/detail/interval_tree.h
+  include/hpp/fcl/broadphase/detail/interval_tree_node.h
+  include/hpp/fcl/broadphase/detail/morton-inl.h
+  include/hpp/fcl/broadphase/detail/morton.h
+  include/hpp/fcl/broadphase/detail/node_base-inl.h
+  include/hpp/fcl/broadphase/detail/node_base.h
+  include/hpp/fcl/broadphase/detail/node_base_array-inl.h
+  include/hpp/fcl/broadphase/detail/node_base_array.h
+  include/hpp/fcl/broadphase/detail/simple_hash_table-inl.h
+  include/hpp/fcl/broadphase/detail/simple_hash_table.h
+  include/hpp/fcl/broadphase/detail/simple_interval-inl.h
+  include/hpp/fcl/broadphase/detail/simple_interval.h
+  include/hpp/fcl/broadphase/detail/sparse_hash_table-inl.h
+  include/hpp/fcl/broadphase/detail/sparse_hash_table.h
+  include/hpp/fcl/broadphase/detail/spatial_hash-inl.h
+  include/hpp/fcl/broadphase/detail/spatial_hash.h
   include/hpp/fcl/narrowphase/narrowphase.h
   include/hpp/fcl/narrowphase/gjk.h
   include/hpp/fcl/shape/convex.h
   include/hpp/fcl/shape/details/convex.hxx
   include/hpp/fcl/shape/geometric_shape_to_BVH_model.h
   include/hpp/fcl/shape/geometric_shapes.h
+  include/hpp/fcl/shape/geometric_shapes_traits.h
   include/hpp/fcl/shape/geometric_shapes_utility.h
   include/hpp/fcl/distance_func_matrix.h
   include/hpp/fcl/collision.h
@@ -195,6 +230,7 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/fcl/mesh_loader/loader.h
   include/hpp/fcl/internal/BV_fitter.h
   include/hpp/fcl/internal/BV_splitter.h
+  include/hpp/fcl/internal/shape_shape_func.h
   include/hpp/fcl/internal/intersect.h
   include/hpp/fcl/internal/tools.h
   include/hpp/fcl/internal/traversal_node_base.h
@@ -242,3 +278,7 @@ INSTALL(FILES package.xml DESTINATION share/${PROJECT_NAME})
 # Allows Colcon to find non-Ament packages when using workspace underlays
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} "")
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} DESTINATION share/ament_index/resource_index/packages)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv "prepend-non-duplicate;AMENT_PREFIX_PATH;")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/python_path.dsv "prepend-non-duplicate;PYTHONPATH;${PYTHON_SITELIB}")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/python_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
