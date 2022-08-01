@@ -1,0 +1,25 @@
+From 5bf4f75e721d5fd40831cb8f6ca7791061c71e9e Mon Sep 17 00:00:00 2001
+From: Wolfgang Merkt <w.merkt@gmail.com>
+Date: Mon, 1 Aug 2022 12:41:40 +0100
+Subject: [PATCH] Set PYTHON_EXECUTABLE for Debian Buster
+
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 883c9e9..127e740 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -57,6 +57,8 @@ IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
+   MESSAGE(FATAL_ERROR "\nPlease run the following command first:\ngit submodule update --init\n")
+ ENDIF()
+ 
++set(PYTHON_EXECUTABLE "/usr/bin/python3")  # Patch for Debian Buster - select Python3
++
+ include(cmake/boost.cmake)
+ include(cmake/python.cmake)
+ include(cmake/hpp.cmake)
+-- 
+2.25.1
+
