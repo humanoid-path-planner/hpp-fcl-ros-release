@@ -339,16 +339,16 @@ macro(FINDPYTHON)
 
   if(PYTHON_EXPORT_DEPENDENCY)
     install_jrl_cmakemodules_file("python.cmake")
-    string(CONCAT PYTHON_EXPORT_DEPENDENCY_MACROS "if(NOT PYTHON_COMPONENTS)\n"
-                  "  set(PYTHON_COMPONENTS ${PYTHON_COMPONENTS})\n" "endif()\n"
-                  "FINDPYTHON()")
+    string(CONCAT PYTHON_EXPORT_DEPENDENCY_MACROS
+                  "list(APPEND PYTHON_COMPONENTS ${PYTHON_COMPONENTS})\n"
+                  "list(REMOVE_DUPLICATES PYTHON_COMPONENTS)\n" "FINDPYTHON()")
   endif()
 
   if(SEARCH_FOR_NUMPY)
     find_numpy()
     if(PYTHON_EXPORT_DEPENDENCY)
       set(PYTHON_EXPORT_DEPENDENCY_MACROS
-          "${PYTHON_EXPORT_DEPENDENCY_MACROS}\nFIND_NUMPY()")
+          "set(SEARCH_FOR_NUMPY TRUE)\n${PYTHON_EXPORT_DEPENDENCY_MACROS}")
     endif()
   endif()
 
@@ -413,15 +413,8 @@ macro(DYNAMIC_GRAPH_PYTHON_MODULE SUBMODULENAME LIBRARYNAME TARGETNAME)
     )
   endif()
 
-  if(NOT DEFINED PYTHONLIBS_FOUND)
-    findpython()
-  elseif(NOT ${PYTHONLIBS_FOUND} STREQUAL "TRUE")
-    message(FATAL_ERROR "Python has not been found.")
-  endif()
-  if(NOT DEFINED Boost_PYTHON_LIBRARIES)
-    message(
-      FATAL_ERROR
-        "Boost Python library must have been found to call this macro.")
+  if(NOT eigenpy_DIR)
+    find_package(eigenpy 2.7.10 REQUIRED)
   endif()
 
   set(PYTHON_MODULE ${TARGETNAME})
@@ -444,18 +437,16 @@ macro(DYNAMIC_GRAPH_PYTHON_MODULE SUBMODULENAME LIBRARYNAME TARGETNAME)
   )
 
   if(UNIX AND NOT APPLE)
-    target_link_libraries(${PYTHON_MODULE} ${PUBLIC_KEYWORD}
-                          "-Wl,--no-as-needed")
+    target_link_libraries(${PYTHON_MODULE} PUBLIC "-Wl,--no-as-needed")
   endif(UNIX AND NOT APPLE)
-  target_link_libraries(${PYTHON_MODULE} ${PUBLIC_KEYWORD} ${LIBRARYNAME}
-                        ${PYTHON_LIBRARY} dynamic-graph::dynamic-graph)
-  target_link_boost_python(${PYTHON_MODULE} ${PUBLIC_KEYWORD})
+  target_link_libraries(${PYTHON_MODULE} PUBLIC ${LIBRARYNAME}
+                                                dynamic-graph::dynamic-graph)
+  target_link_boost_python(${PYTHON_MODULE} PUBLIC)
   if(PROJECT_NAME STREQUAL "dynamic-graph-python")
-    target_link_libraries(${PYTHON_MODULE} ${PUBLIC_KEYWORD}
-                          dynamic-graph-python)
+    target_link_libraries(${PYTHON_MODULE} PUBLIC dynamic-graph-python)
   else()
-    target_link_libraries(${PYTHON_MODULE} ${PUBLIC_KEYWORD}
-                          dynamic-graph-python::dynamic-graph-python)
+    target_link_libraries(${PYTHON_MODULE}
+                          PUBLIC dynamic-graph-python::dynamic-graph-python)
   endif()
 
   target_include_directories(${PYTHON_MODULE} SYSTEM
@@ -628,7 +619,7 @@ endmacro()
 
 macro(FIND_NUMPY)
   # Detect numpy.
-  message(STATUS "checking for numpy")
+  message(STATUS "Checking for NumPy")
   execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" "-c" "import numpy; print (True)"
     OUTPUT_VARIABLE IS_NUMPY
