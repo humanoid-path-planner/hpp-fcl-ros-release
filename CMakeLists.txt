@@ -1,7 +1,7 @@
 #
 # Software License Agreement (BSD License)
 #
-#  Copyright (c) 2014-2020 CNRS-LAAS, INRIA
+#  Copyright (c) 2014-2022 CNRS-LAAS, INRIA
 #  Author: Florent Lamiraux, Joseph Mirabel
 #  All rights reserved.
 #
@@ -57,8 +57,6 @@ OPTION(INSTALL_DOCUMENTATION "Generate and install the documentation" OFF)
 IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
   MESSAGE(FATAL_ERROR "\nPlease run the following command first:\ngit submodule update --init\n")
 ENDIF()
-
-set(PYTHON_EXECUTABLE "/usr/bin/python3")  # Patch for Debian Buster - select Python3
 
 include(cmake/boost.cmake)
 include(cmake/hpp.cmake)
@@ -251,6 +249,7 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/fcl/serialization/BVH_model.h
   include/hpp/fcl/serialization/collision_data.h
   include/hpp/fcl/serialization/collision_object.h
+  include/hpp/fcl/serialization/convex.h
   include/hpp/fcl/serialization/eigen.h
   include/hpp/fcl/serialization/geometric_shapes.h
   include/hpp/fcl/serialization/memory.h
@@ -258,6 +257,8 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/fcl/serialization/RSS.h
   include/hpp/fcl/serialization/OBBRSS.h
   include/hpp/fcl/serialization/hfield.h
+  include/hpp/fcl/serialization/quadrilateral.h
+  include/hpp/fcl/serialization/triangle.h
   include/hpp/fcl/timings.h
   )
 
