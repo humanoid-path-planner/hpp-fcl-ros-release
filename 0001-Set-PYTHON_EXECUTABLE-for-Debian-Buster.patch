@@ -1,4 +1,4 @@
-From a2fc7ae4613cdf7d9c44ebd67fd9c921770473cf Mon Sep 17 00:00:00 2001
+From 985c3bfe196791656ae80db4a2db2778e46afc41 Mon Sep 17 00:00:00 2001
 From: Wolfgang Merkt <w.merkt@gmail.com>
 Date: Mon, 1 Aug 2022 12:41:40 +0100
 Subject: [PATCH] Set PYTHON_EXECUTABLE for Debian Buster
