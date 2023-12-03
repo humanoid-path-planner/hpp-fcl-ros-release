@@ -32,7 +32,7 @@
 #  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #  POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 set(CXX_DISABLE_WERROR TRUE)
 
 set(PROJECT_NAME hpp-fcl)
@@ -42,8 +42,6 @@ set(PROJECT_DESCRIPTION
 SET(PROJECT_USE_CMAKE_EXPORT TRUE)
 SET(PROJECT_COMPATIBILITY_VERSION AnyNewerVersion)
 
-# Do not support CMake older than 2.8.12
-CMAKE_POLICY(SET CMP0022 NEW)
 SET(PROJECT_USE_KEYWORD_LINK_LIBRARIES TRUE)
 SET(DOXYGEN_USE_TEMPLATE_CSS TRUE)
 
@@ -54,28 +52,41 @@ SET(DOXYGEN_USE_TEMPLATE_CSS TRUE)
 OPTION(INSTALL_DOCUMENTATION "Generate and install the documentation" OFF)
 
 # Check if the submodule cmake have been initialized
-IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
-  MESSAGE(FATAL_ERROR "\nPlease run the following command first:\ngit submodule update --init\n")
-ENDIF()
+set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
+  if(${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    message(
+      FATAL_ERROR
+        "\nPlease run the following command first:\ngit submodule update --init\n"
+    )
+  else()
+    message(STATUS "JRL cmakemodules not found. Let's fetch it.")
+    include(FetchContent)
+    FetchContent_Declare(
+      "jrl-cmakemodules"
+      GIT_REPOSITORY "https://github.com/jrl-umi3218/jrl-cmakemodules.git")
+    FetchContent_MakeAvailable("jrl-cmakemodules")
+    FetchContent_GetProperties("jrl-cmakemodules" SOURCE_DIR JRL_CMAKE_MODULES)
+  endif()
+endif()
 
-include(cmake/boost.cmake)
-include(cmake/hpp.cmake)
-include(cmake/apple.cmake)
-include(cmake/ide.cmake)
+include("${JRL_CMAKE_MODULES}/boost.cmake")
+include("${JRL_CMAKE_MODULES}/hpp.cmake")
+include("${JRL_CMAKE_MODULES}/apple.cmake")
+include("${JRL_CMAKE_MODULES}/ide.cmake")
 include(CMakeDependentOption)
 
 SET(CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake-modules/
   ${CMAKE_MODULE_PATH})
 
+set_default_cmake_build_type("RelWithDebInfo")
+
 # If needed, fix CMake policy for APPLE systems
 APPLY_DEFAULT_APPLE_CONFIGURATION()
 
 COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
 PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
-
-# Default C++ version should be C++11
-CHECK_MINIMAL_CXX_STANDARD(11 ENFORCE)
 
 OPTION(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
 CMAKE_DEPENDENT_OPTION(GENERATE_PYTHON_STUBS "Generate the Python stubs associated to the Python library" OFF BUILD_PYTHON_INTERFACE OFF)
@@ -111,6 +122,14 @@ if(BUILD_PYTHON_INTERFACE)
   find_package(Boost REQUIRED COMPONENTS system)
 endif(BUILD_PYTHON_INTERFACE)
 
+if(Boost_VERSION_STRING VERSION_LESS 1.81)
+  # Default C++ version should be C++11
+  CHECK_MINIMAL_CXX_STANDARD(11 ENFORCE)
+else()
+  # Boost.Math will be C++14 starting in July 2023 (Boost 1.82 release)
+  CHECK_MINIMAL_CXX_STANDARD(14 ENFORCE)
+endif()
+
 # Optional dependencies
 ADD_PROJECT_DEPENDENCY(octomap PKG_CONFIG_REQUIRES "octomap >= 1.6")
 if(octomap_FOUND)
@@ -119,10 +138,10 @@ if(octomap_FOUND)
   list(GET VERSION_LIST 0 OCTOMAP_MAJOR_VERSION)
   list(GET VERSION_LIST 1 OCTOMAP_MINOR_VERSION)
   list(GET VERSION_LIST 2 OCTOMAP_PATCH_VERSION)
-  message(STATUS "FCL uses Octomap")
+  message(STATUS "HPP-FCL uses Octomap")
 else()
   SET(HPP_FCL_HAS_OCTOMAP FALSE)
-  message(STATUS "FCL does not use Octomap")
+  message(STATUS "HPP-FCL does not use Octomap")
 endif()
 
 option(HPP_FCL_HAS_QHULL "use qhull library to compute convex hulls." FALSE)
@@ -130,6 +149,7 @@ if(HPP_FCL_HAS_QHULL)
   find_package(Qhull COMPONENTS qhull_r qhullcpp)
   if(Qhull_FOUND)
     set(HPP_FCL_USE_SYSTEM_QHULL TRUE)
+    message(STATUS "HPP-FCL uses system Qhull")
   else()
     message(STATUS "Qhullcpp not found: it will be build from sources, if Qhull_r is found")
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/third-parties)
