@@ -1,0 +1,12 @@
+Source: ros-noetic-hpp-fcl
+Section: misc
+Priority: optional
+Maintainer: Joseph Mirabel <jmirabel@laas.fr>
+Build-Depends: debhelper (>= 9.0.0), cmake, doxygen, git, libassimp-dev, libboost-all-dev, libeigen3-dev, liboctomap-dev, python3-dev, python3-lxml, python3-numpy, ros-noetic-eigenpy
+Homepage: https://github.com/humanoid-path-planner/hpp-fcl
+Standards-Version: 3.9.2
+
+Package: ros-noetic-hpp-fcl
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libassimp-dev, libboost-all-dev, libeigen3-dev, liboctomap-dev, python3-dev, python3-numpy, ros-noetic-catkin, ros-noetic-eigenpy
+Description: An extension of the Flexible Collision Library.
